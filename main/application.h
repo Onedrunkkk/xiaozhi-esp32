@@ -46,6 +46,7 @@ public:
     void MainEventLoop();
     DeviceState GetDeviceState() const { return device_state_; }
     bool IsVoiceDetected() const { return audio_service_.IsVoiceDetected(); }
+    AudioService& GetAudioService() { return audio_service_; }  // 添加GetAudioService函数声明
     void Schedule(std::function<void()> callback);
     void SetDeviceState(DeviceState state);
     void Alert(const char* status, const char* message, const char* emotion = "", const std::string_view& sound = "");
@@ -61,7 +62,6 @@ public:
     void SetAecMode(AecMode mode);
     AecMode GetAecMode() const { return aec_mode_; }
     void PlaySound(const std::string_view& sound);
-    AudioService& GetAudioService() { return audio_service_; }
 
 private:
     Application();

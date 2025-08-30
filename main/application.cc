@@ -822,3 +822,14 @@ void Application::SetAecMode(AecMode mode) {
 void Application::PlaySound(const std::string_view& sound) {
     audio_service_.PlaySound(sound);
 }
+
+// 添加供外部组件调用的C接口
+extern "C" void application_set_device_state(int state) {
+    auto& app = Application::GetInstance();
+    app.SetDeviceState(static_cast<DeviceState>(state));
+}
+
+extern "C" bool is_audio_speaking() {
+    auto& app = Application::GetInstance();
+    return app.GetDeviceState() == kDeviceStateSpeaking;
+}

@@ -1,3 +1,13 @@
+## IDF Component Manager Manifest File
 dependencies:
+  ## Required IDF version
   idf:
-    version: ">=4.4"
+    version: ">=4.4.5"
+  espressif/mdns:
+    version: "^1.0.3"
+  ## Public dependencies can be used by downstream projects
+  # public_name_of_dependency:
+  #   version: "^1.0.0"
+  ## Development dependencies are only used for development
+  # dev_name_of_dependency:
+  #   version: "^1.0.0"

@@ -14,6 +14,10 @@
 #include "display.h"
 #include "board.h"
 
+// 添加WiFi重新配置功能相关头文件
+#include "../newfunction/wifi_reconfig.h"
+#include <nvs_flash.h>
+
 #define TAG "MCP"
 
 #define DEFAULT_TOOLCALL_STACK_SIZE 6144
@@ -35,6 +39,26 @@ void McpServer::AddCommonTools() {
     auto original_tools = std::move(tools_);
     auto& board = Board::GetInstance();
     auto& alarm_manager = AlarmManager::GetInstance();
+
+    // 添加WiFi重新配置工具
+    AddTool("self.system.reconfigure_wifi",
+        "Reboot the device and enter WiFi configuration mode.\n"
+        "**CAUTION** You must ask the user to confirm this action before calling this tool.",
+        PropertyList(),
+        [](const PropertyList& properties) -> ReturnValue {
+            ESP_LOGI(TAG, "WiFi reconfiguration requested via MCP tool");
+            
+            // 使用WiFi重新配置模块
+            auto& wifi_reconfig = WifiReconfig::GetInstance();
+            esp_err_t err = wifi_reconfig.ResetWifiConfigAndReboot();
+            if (err != ESP_OK) {
+                ESP_LOGE(TAG, "Failed to reset WiFi config: %s", esp_err_to_name(err));
+                return "Failed to reset WiFi configuration";
+            }
+            
+            // 这个返回值实际上不会被发送，因为设备会重启
+            return "Device is resetting WiFi configuration and will reboot shortly. Please connect to the device's WiFi hotspot to configure network settings after reboot.";
+        });
 
     AddTool("self.get_device_status",
         "Provides the real-time information of the device, including the current status of the audio speaker, screen, battery, network, etc.\n"
