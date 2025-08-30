@@ -34,6 +34,7 @@ void McpServer::AddCommonTools() {
     // Backup the original tools list and restore it after adding the common tools.
     auto original_tools = std::move(tools_);
     auto& board = Board::GetInstance();
+    auto& alarm_manager = AlarmManager::GetInstance();
 
     AddTool("self.get_device_status",
         "Provides the real-time information of the device, including the current status of the audio speaker, screen, battery, network, etc.\n"
@@ -43,6 +44,75 @@ void McpServer::AddCommonTools() {
         PropertyList(),
         [&board](const PropertyList& properties) -> ReturnValue {
             return board.GetDeviceStatusJson();
+        });
+
+    // 添加闹钟工具
+    AddTool("alarm.set",
+        "Set an alarm clock",
+        PropertyList({
+            Property("hour", kPropertyTypeInteger, 0, 23),
+            Property("minute", kPropertyTypeInteger, 0, 59),
+            Property("label", kPropertyTypeString, ""),
+            Property("repeat_mode", kPropertyTypeInteger, 0, 5),
+            Property("enabled", kPropertyTypeBoolean, true)
+        }),
+        [&alarm_manager](const PropertyList& properties) -> ReturnValue {
+            Alarm alarm;
+            alarm.hour = properties["hour"].value<int>();
+            alarm.minute = properties["minute"].value<int>();
+            alarm.label = properties["label"].value<std::string>();
+            alarm.repeat_mode = (AlarmRepeatMode)properties["repeat_mode"].value<int>();
+            alarm.enabled = properties["enabled"].value<bool>();
+            
+            esp_err_t err = alarm_manager.AddAlarm(alarm);
+            if (err == ESP_OK) {
+                return "Alarm set successfully";
+            } else {
+                return "Failed to set alarm";
+            }
+        });
+    
+    AddTool("alarm.list",
+        "List all alarm clocks",
+        PropertyList(),
+        [&alarm_manager](const PropertyList& properties) -> ReturnValue {
+            return alarm_manager.GetAlarmsAsJson();
+        });
+    
+    AddTool("alarm.delete",
+        "Delete an alarm clock by ID",
+        PropertyList({
+            Property("id", kPropertyTypeInteger)
+        }),
+        [&alarm_manager](const PropertyList& properties) -> ReturnValue {
+            uint32_t id = properties["id"].value<int>();
+            esp_err_t err = alarm_manager.DeleteAlarm(id);
+            if (err == ESP_OK) {
+                return "Alarm deleted successfully";
+            } else {
+                return "Failed to delete alarm";
+            }
+        });
+    
+    AddTool("alarm.enable",
+        "Enable or disable an alarm clock by ID",
+        PropertyList({
+            Property("id", kPropertyTypeInteger),
+            Property("enable", kPropertyTypeBoolean)
+        }),
+        [&alarm_manager](const PropertyList& properties) -> ReturnValue {
+            uint32_t id = properties["id"].value<int>();
+            bool enable = properties["enable"].value<bool>();
+            esp_err_t err = alarm_manager.EnableAlarm(id, enable);
+            if (err == ESP_OK) {
+                if (enable) {
+                    return "Alarm enabled successfully";
+                } else {
+                    return "Alarm disabled successfully";
+                }
+            } else {
+                return "Failed to change alarm state";
+            }
         });
 
     AddTool("self.audio_speaker.set_volume", 

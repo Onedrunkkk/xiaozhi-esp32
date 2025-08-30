@@ -8,12 +8,17 @@
 #include "assets/lang_config.h"
 #include "mcp_server.h"
 
+// 添加闹钟功能相关引用
+#include "alarm.h"
+
 #include <cstring>
 #include <esp_log.h>
 #include <cJSON.h>
 #include <driver/gpio.h>
 #include <arpa/inet.h>
 #include <font_awesome.h>
+#include <nvs_flash.h>
+#include <esp_event.h>
 
 #define TAG "Application"
 
@@ -327,6 +332,49 @@ void Application::StopListening() {
 
 void Application::Start() {
     auto& board = Board::GetInstance();
+    
+    // Initialize NVS flash for WiFi configuration
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+        ESP_LOGW(TAG, "Erasing NVS flash to fix corruption");
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    // Initialize the MCP server and add common tools
+    auto& mcp_server = McpServer::GetInstance();
+    mcp_server.AddCommonTools();
+    
+    // 初始化闹钟系统
+    auto& alarm_manager = AlarmManager::GetInstance();
+    alarm_manager.Initialize();
+    
+    // 启动闹钟检查定时器
+    esp_timer_create_args_t alarm_timer_args = {
+        .callback = [](void* arg) {
+            auto& alarm_manager = AlarmManager::GetInstance();
+            bool triggered = alarm_manager.CheckAlarms();
+            
+            if (triggered) {
+                // 闹钟触发，唤醒AI
+                ESP_LOGI("Application", "An alarm has been triggered!");
+                auto& app = Application::GetInstance();
+                // 使用WakeWordInvoke方法唤醒AI并传递具体消息
+                app.WakeWordInvoke("闹钟响了，需要大声唤醒用户");
+            }
+        },
+        .arg = nullptr,
+        .dispatch_method = ESP_TIMER_TASK,
+        .name = "alarm_check_timer",
+        .skip_unhandled_events = true
+    };
+    
+    esp_timer_handle_t alarm_timer;
+    esp_timer_create(&alarm_timer_args, &alarm_timer);
+    // 改回每分钟检查一次，更加节能
+    esp_timer_start_periodic(alarm_timer, 60 * 1000 * 1000); // 每分钟检查一次
+
     SetDeviceState(kDeviceStateStarting);
 
     /* Setup the display */

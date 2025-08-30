@@ -9,6 +9,8 @@ set(PROJECT_VER "1.9.0")
 # Add this line to disable the specific warning
 add_compile_options(-Wno-missing-field-initializers)
 
+# 添加新功能组件目录
+set(EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/newfunction")
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(xiaozhi)
-
