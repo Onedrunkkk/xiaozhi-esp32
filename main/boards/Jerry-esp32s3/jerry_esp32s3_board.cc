@@ -36,7 +36,7 @@
 #include <wifi_station.h>
 
 // 添加字体声明
-LV_FONT_DECLARE(font_puhui_20_4);
+LV_FONT_DECLARE(font_YSHaoShenTi_18px_b4);
 LV_FONT_DECLARE(font_awesome_20_4);
 
 #define TAG "JerryEsp32s3Board"
@@ -132,7 +132,7 @@ private:
         
         // 创建LCD显示对象
         DisplayFonts fonts = {
-            .text_font = &font_puhui_20_4,
+            .text_font = &font_YSHaoShenTi_18px_b4,
             .icon_font = &font_awesome_20_4,
             .emoji_font = font_emoji_32_init(),  // 使用32像素的emoji字体
         };
