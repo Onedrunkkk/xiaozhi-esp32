@@ -1,46 +1,55 @@
 # Jerry ESP32-S3 开发板
 
-该开发板基于ESP32-S3-R8N16模组，集成了以下外设：
+Jerry ESP32-S3是一款专为AI聊天机器人设计的开发板，具有以下特点：
 
 ## 硬件特性
 
-### 显示屏
-- ST7789 LCD显示屏 (240x240)
-- SPI接口连接
+- 主控芯片：ESP32-S3
+- 集成2.4寸彩色LCD显示屏（240x320分辨率）
+- 集成摄像头（用于人脸识别等应用）
+- 集成麦克风和扬声器（语音交互）
+- 集成WS2812 RGB LED（状态指示）
+- 支持Wi-Fi和蓝牙连接
 
-### 音频
-- INMP441 数字麦克风 (I2S输入)
-- MAX98367A 数字功放 (I2S输出)
+## 开发板配置
 
-### LED
-- WS2812 RGB灯带
+该开发板使用标准的ESP32-S3配置，具有以下特点：
+
+- 使用SPI接口连接的ST7789 LCD显示屏
+- 使用I2S接口连接的音频编解码器
+- 使用GPIO连接的按钮和LED
+
+## 字体配置
+
+本开发板使用YSHaoShenTi字体作为主要文本显示字体，具有良好的中文显示效果。字体配置信息如下：
+
+- 文本字体：YSHaoShenTi 18px (4位色深)
+- 图标字体：Font Awesome 20px
+- 表情字体：内置Emoji字体
+
+如需修改字体，可以在`jerry_esp32s3_board.cc`文件中修改[DisplayFonts](file:///d:/ESP32/Project/ESP32-AI/xiaozhi-esp32/managed_components/78__xiaozhi-display/src/display.h#L12-L16)结构体中的[text_font](file:///d:/ESP32/Project/ESP32-AI/xiaozhi-esp32/managed_components/78__xiaozhi-display/src/display.h#L13-L13)字段，并在CMakeLists.txt中添加相应的字体文件路径。
 
 ## 引脚分配
 
-| 功能 | ESP32引脚 | 说明 |
-|------|-----------|------|
-| 屏幕_BL | GPIO42 | 背光控制 |
-| 屏幕_CS | GPIO41 | SPI片选 |
-| 屏幕_DC | GPIO40 | 数据/命令选择 |
-| 屏幕_RST | GPIO45 | 复位引脚 |
-| 屏幕_MOSI | GPIO47 | SPI数据输出 |
-| 屏幕_SCK | GPIO21 | SPI时钟 |
+### 音频部分
+- I2S麦克风引脚：
+  - WS: GPIO4
+  - SCK: GPIO5
+  - DIN: GPIO6
 
-| 功能 | ESP32引脚 | 说明 |
-|------|-----------|------|
-| WS2812 | GPIO48 | 数据输入 |
+- I2S功放引脚：
+  - DOUT: GPIO7
+  - BCLK: GPIO15
+  - LRCK: GPIO16
 
-| 功能 | ESP32引脚 | 说明 |
-|------|-----------|------|
-| MIC_SD | GPIO6 | 麦克风数据输入 |
-| MIC_SCK | GPIO5 | 麦克风位时钟 |
-| MIC_WS | GPIO4 | 麦克风帧同步 |
+### 显示部分
+- SPI显示屏引脚：
+  - MOSI: GPIO11
+  - SCLK: GPIO12
+  - CS: GPIO10
+  - DC: GPIO13
+  - RST: GPIO14
 
-| 功能 | ESP32引脚 | 说明 |
-|------|-----------|------|
-| AMP_LRC | GPIO16 | 功放帧同步 |
-| AMP_BCLK | GPIO15 | 功放位时钟 |
-| AMP_DIN | GPIO7 | 功放数据输入 |
-
-## 分区表
-使用16MB Flash分区表
+### 其他外设
+- RGB LED: GPIO48
+- 按键: GPIO0
