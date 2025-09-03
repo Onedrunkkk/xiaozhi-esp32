@@ -25,9 +25,11 @@ set(SOURCES "audio/audio_codec.cc"
             "device_state_event.cc"
             "main.cc"
             "../newfunction/font/font_YSHaoShenTi_18px_b4.c"
+            "../newfunction/gif/happy.c"
+            "../newfunction/gif/natural.c"
             )
 
-set(INCLUDE_DIRS "." "display" "audio" "protocols" "../newfunction/font")
+set(INCLUDE_DIRS "." "display" "audio" "protocols" "../newfunction/font" "../newfunction/gif")
 
 # 添加板级公共文件
 file(GLOB BOARD_COMMON_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/boards/common/*.cc)

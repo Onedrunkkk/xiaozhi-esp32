@@ -9,14 +9,12 @@
 
 #define TAG "JerryEmojiDisplay"
 
-// 表情映射表 - 将多种表情映射到现有6个GIF
+// 表情映射表 - 将所有表情都映射到happy GIF
 const JerryEmojiDisplay::EmotionMap JerryEmojiDisplay::emotion_maps_[] = {
-    // 中性/平静类表情 -> staticstate
-    {"neutral", &staticstate},
-    {"relaxed", &staticstate},
-    {"sleepy", &staticstate},
-
-    // 积极/开心类表情 -> happy
+    // 所有表情都使用happy GIF
+    {"neutral", &happy},
+    {"relaxed", &happy},
+    {"sleepy", &happy},
     {"happy", &happy},
     {"laughing", &happy},
     {"funny", &happy},
@@ -27,22 +25,15 @@ const JerryEmojiDisplay::EmotionMap JerryEmojiDisplay::emotion_maps_[] = {
     {"delicious", &happy},
     {"kissy", &happy},
     {"silly", &happy},
-
-    // 悲伤类表情 -> sad
-    {"sad", &sad},
-    {"crying", &sad},
-
-    // 愤怒类表情 -> anger
-    {"angry", &anger},
-
-    // 惊讶类表情 -> scare
-    {"surprised", &scare},
-    {"shocked", &scare},
-
-    // 思考/困惑类表情 -> buxue
-    {"thinking", &buxue},
-    {"confused", &buxue},
-    {"embarrassed", &buxue},
+    {"sad", &happy},
+    {"crying", &happy},
+    {"angry", &happy},
+    {"surprised", &happy},
+    {"shocked", &happy},
+    {"thinking", &happy},
+    {"confused", &happy},
+    {"embarrassed", &happy},
+    {"natural", &happy},
 
     {nullptr, nullptr}  // 结束标记
 };
@@ -85,12 +76,15 @@ void JerryEmojiDisplay::SetupGifContainer() {
     lv_obj_add_flag(emotion_label_, LV_OBJ_FLAG_HIDDEN);
 
     emotion_gif_ = lv_gif_create(content_);
-    int gif_size = LV_HOR_RES;
+    // 设置GIF显示区域为屏幕的60%
+    int gif_size = LV_HOR_RES * 0.6;
     lv_obj_set_size(emotion_gif_, gif_size, gif_size);
     lv_obj_set_style_border_width(emotion_gif_, 0, 0);
     lv_obj_set_style_bg_opa(emotion_gif_, LV_OPA_TRANSP, 0);
     lv_obj_center(emotion_gif_);
-    lv_gif_set_src(emotion_gif_, &staticstate);
+    lv_gif_set_src(emotion_gif_, &happy);
+    // 设置GIF缩放以适应显示区域
+    lv_image_set_scale(emotion_gif_, (gif_size * 256) / 238); // 256是LVGL缩放的基数
 
     chat_message_label_ = lv_label_create(content_);
     lv_label_set_text(chat_message_label_, "");
@@ -116,54 +110,38 @@ void JerryEmojiDisplay::SetEmotion(const char* emotion) {
 
     DisplayLockGuard lock(this);
 
-    for (const auto& map : emotion_maps_) {
-        if (map.name && strcmp(map.name, emotion) == 0) {
-            lv_gif_set_src(emotion_gif_, map.gif);
-            ESP_LOGI(TAG, "设置表情: %s", emotion);
-            return;
+    // 查找匹配的表情
+    const lv_image_dsc_t* gif = &happy;  // 默认表情改为happy
+    int gif_width = 238; // 默认GIF宽度
+    int display_size = LV_HOR_RES * 0.6; // 显示区域大小
+    
+    for (int i = 0; emotion_maps_[i].name; i++) {
+        if (strcmp(emotion, emotion_maps_[i].name) == 0) {
+            gif = emotion_maps_[i].gif;
+            break;
         }
     }
 
-    lv_gif_set_src(emotion_gif_, &staticstate);
-    ESP_LOGI(TAG, "未知表情'%s'，使用默认", emotion);
+    lv_gif_set_src(emotion_gif_, gif);
+    
+    // 根据不同GIF设置合适的缩放比例
+    if (gif == &natural) {
+        gif_width = 236;
+    }
+    // 计算缩放比例，使GIF适应显示区域
+    int scale = (display_size * 256) / gif_width;
+    lv_image_set_scale(emotion_gif_, scale);
 }
 
 void JerryEmojiDisplay::SetChatMessage(const char* role, const char* content) {
+    if (!chat_message_label_ || !content) {
+        return;
+    }
+
     DisplayLockGuard lock(this);
-    if (chat_message_label_ == nullptr) {
-        return;
-    }
-
-    if (content == nullptr || strlen(content) == 0) {
-        lv_obj_add_flag(chat_message_label_, LV_OBJ_FLAG_HIDDEN);
-        return;
-    }
-
     lv_label_set_text(chat_message_label_, content);
-    lv_obj_remove_flag(chat_message_label_, LV_OBJ_FLAG_HIDDEN);
-
-    ESP_LOGI(TAG, "设置聊天消息 [%s]: %s", role, content);
 }
 
 void JerryEmojiDisplay::SetIcon(const char* icon) {
-    if (!icon) {
-        return;
-    }
-
-    DisplayLockGuard lock(this);
-
-    if (chat_message_label_ != nullptr) {
-        std::string icon_message = std::string(icon) + " ";
-
-        if (strcmp(icon, FONT_AWESOME_DOWNLOAD) == 0) {
-            icon_message += "正在升级...";
-        } else {
-            icon_message += "系统状态";
-        }
-
-        lv_label_set_text(chat_message_label_, icon_message.c_str());
-        lv_obj_remove_flag(chat_message_label_, LV_OBJ_FLAG_HIDDEN);
-
-        ESP_LOGI(TAG, "设置图标: %s", icon);
-    }
+    // Jerry开发板暂不支持图标显示
 }

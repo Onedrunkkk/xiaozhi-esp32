@@ -12,6 +12,9 @@ LV_IMAGE_DECLARE(scare);        // 惊吓/惊讶
 LV_IMAGE_DECLARE(buxue);        // 不学/困惑
 LV_IMAGE_DECLARE(anger);        // 愤怒
 
+// Jerry开发板新增的自定义GIF声明
+LV_IMAGE_DECLARE(natural);      // 自然表情
+
 /**
  * @brief Jerry ESP32-S3开发板GIF表情显示类
  * 继承SpiLcdDisplay，添加GIF表情支持
