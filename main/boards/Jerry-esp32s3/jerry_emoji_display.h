@@ -1,6 +1,8 @@
 #pragma once
 
 #include <libs/gif/lv_gif.h>
+#include "settings.h"
+#include <esp_lvgl_port.h>
 
 #include "display/lcd_display.h"
 
@@ -14,6 +16,14 @@ LV_IMAGE_DECLARE(anger);        // 愤怒
 
 // Jerry开发板新增的自定义GIF声明
 LV_IMAGE_DECLARE(natural);      // 自然表情
+
+// 新添加的GIF表情声明
+LV_IMAGE_DECLARE(angry_25fps);
+LV_IMAGE_DECLARE(disdain_25fps);
+LV_IMAGE_DECLARE(scare_25fps);
+LV_IMAGE_DECLARE(natural_new_25fps);
+LV_IMAGE_DECLARE(sad_25fps);
+LV_IMAGE_DECLARE(excitement_25fps);
 
 /**
  * @brief Jerry ESP32-S3开发板GIF表情显示类
@@ -38,11 +48,16 @@ public:
 
     // 重写图标设置方法
     virtual void SetIcon(const char* icon) override;
+    
+    // 重写主题设置方法
+    virtual void SetTheme(const std::string& theme_name) override;
 
 private:
     void SetupGifContainer();
+    void UpdateGifForCurrentTheme(); // 添加新方法声明
 
     lv_obj_t* emotion_gif_;  ///< GIF表情组件
+    const char* current_emotion_; ///< 当前显示的表情名称
 
     // 表情映射
     struct EmotionMap {

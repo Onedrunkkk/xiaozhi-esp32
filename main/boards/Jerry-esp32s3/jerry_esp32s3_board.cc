@@ -21,26 +21,12 @@
 #include <esp_lcd_panel_io_interface.h>
 #include <esp_lcd_panel_st7789.h>
 #include <wifi_station.h>
-#include "assets/lang_config.h"  // 添加字体声明需要的头文件
 #include <driver/i2c_master.h>
 
-#include <esp_log.h>
-#include <driver/spi_common.h>
-#include <driver/spi_master.h>
-#include <esp_lcd_panel_io.h>
-#include <esp_lcd_panel_vendor.h>
-#include <esp_lcd_panel_ops.h>
-#include <esp_lcd_panel_commands.h>
-#include <esp_lcd_types.h>
-#include <esp_lcd_panel_io_interface.h>
-#include <esp_lcd_panel_st7789.h>
-#include <wifi_station.h>
-
-// 添加字体声明
-LV_FONT_DECLARE(font_YSHaoShenTi_18px_b4);
-LV_FONT_DECLARE(font_awesome_20_4);
-
 #define TAG "JerryEsp32s3Board"
+
+LV_FONT_DECLARE(font_YSHaoShenTi_16px_b4);
+LV_FONT_DECLARE(font_awesome_20_4);
 
 class JerryEsp32s3Board : public WifiBoard {
 private:
@@ -133,7 +119,7 @@ private:
         
         // 创建LCD显示对象
         DisplayFonts fonts = {
-            .text_font = &font_YSHaoShenTi_18px_b4,
+            .text_font = &font_YSHaoShenTi_16px_b4,
             .icon_font = &font_awesome_20_4,
             .emoji_font = font_emoji_32_init(),  // 使用32像素的emoji字体
         };

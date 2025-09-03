@@ -24,9 +24,23 @@ set(SOURCES "audio/audio_codec.cc"
             "settings.cc"
             "device_state_event.cc"
             "main.cc"
+            "../newfunction/font/font_YSHaoShenTi_16px_b4.c"
             "../newfunction/font/font_YSHaoShenTi_18px_b4.c"
             "../newfunction/gif/happy.c"
             "../newfunction/gif/natural.c"
+            "../newfunction/gif/angry_25fps.c"
+            "../newfunction/gif/disdain_25fps.c"
+            "../newfunction/gif/scare_25fps.c"
+            "../newfunction/gif/natural_new_25fps.c"
+            "../newfunction/gif/sad_25fps.c"
+            "../newfunction/gif/excitement_25fps.c"
+            # 添加Inversion版本的GIF资源文件
+            "../newfunction/gif/angry_25fps_Inversion.c"
+            "../newfunction/gif/disdain_25fps_Inversion.c"
+            "../newfunction/gif/scare_25fps_Inversion.c"
+            "../newfunction/gif/natural_new_25fps_Inversion.c"
+            "../newfunction/gif/sad_25fps_Inversion.c"
+            "../newfunction/gif/excitement_25fps_Inversion.c"
             )
 
 set(INCLUDE_DIRS "." "display" "audio" "protocols" "../newfunction/font" "../newfunction/gif")

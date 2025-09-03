@@ -13,12 +13,19 @@ list(APPEND BOARD_SOURCES
 list(APPEND BOARD_SOURCES 
     ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/happy.c
     ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/natural.c
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/angry_25fps.c
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/disdain_25fps.c
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/scare_25fps.c
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/natural_new_25fps.c
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/sad_25fps.c
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif/excitement_25fps.c
 )
 
 # 设置包含目录
 list(APPEND BOARD_INCLUDE_DIRS 
     ${CMAKE_CURRENT_LIST_DIR}
     ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/gif
+    ${CMAKE_CURRENT_LIST_DIR}/../../newfunction/font
 )
 
 # 更新全局变量

@@ -1,150 +1,243 @@
-# Jerry ESP32-S3 开发板
+# Jerry ESP32-S3 开发板支持
 
-Jerry ESP32-S3是一款专为AI聊天机器人设计的开发板，具有以下特点：
+## 简介
+
+Jerry ESP32-S3 是一款基于 ESP32-S3 芯片的开发板，集成了 LCD 显示屏、摄像头、麦克风、扬声器等丰富的外设，适用于各种 AI 和 IoT 应用。
 
 ## 硬件特性
 
 - 主控芯片：ESP32-S3
-- 集成2.4寸彩色LCD显示屏（240x320分辨率）
-- 集成摄像头（用于人脸识别等应用）
-- 集成麦克风和扬声器（语音交互）
-- 集成WS2812 RGB LED（状态指示）
-- 支持Wi-Fi和蓝牙连接
-
-## 开发板配置
-
-该开发板使用标准的ESP32-S3配置，具有以下特点：
-
-- 使用SPI接口连接的ST7789 LCD显示屏
-- 使用I2S接口连接的音频编解码器
-- 使用GPIO连接的按钮和LED
-
-## 字体配置
-
-本开发板使用YSHaoShenTi字体作为主要文本显示字体，具有良好的中文显示效果。字体配置信息如下：
-
-- 文本字体：YSHaoShenTi 18px (4位色深)
-- 图标字体：Font Awesome 20px
-- 表情字体：内置Emoji字体
-
-如需修改字体，可以在`jerry_esp32s3_board.cc`文件中修改[DisplayFonts](file:///d:/ESP32/Project/ESP32-AI/xiaozhi-esp32/managed_components/78__xiaozhi-display/src/display.h#L12-L16)结构体中的[text_font](file:///d:/ESP32/Project/ESP32-AI/xiaozhi-esp32/managed_components/78__xiaozhi-display/src/display.h#L13-L13)字段，并在CMakeLists.txt中添加相应的字体文件路径。
-
-### 字体转换指令
-
-如果需要将TTF字体文件转换为LVGL可用的C数组格式，可以使用以下命令：
-
-```bash
-npx lv_font_conv --font "D:/ESP32/Project/font/YSHaoShenTi.ttf" --size 16 --format lvgl --bpp 4 --no-compress -o "D:/ESP32/Project/font/font_YSHaoShenTi_16px_b4.c" --range 0x20-0x7F --range 0x4E00-0x9FFF
-```
-
-参数说明：
-- `--font`: 指定输入的TTF字体文件路径
-- `--size`: 设置字体大小（例如16像素）
-- `--format lvgl`: 指定输出格式为LVGL兼容格式
-- `--bpp 4`: 设置颜色深度为4位（16级灰度）
-- `--no-compress`: 禁用压缩以获得更好的显示效果
-- `-o`: 指定输出文件路径
-- `--range`: 指定字符范围，包括ASCII字符(0x20-0x7F)和中文常用汉字(0x4E00-0x9FFF)
-
-## GIF表情显示功能
-
-Jerry开发板支持显示GIF格式的表情动画，用于增强人机交互体验。GIF表情功能要点如下：
-
-### GIF资源管理
-- GIF文件存储在`newfunction/gif/`目录下
-- 每个GIF文件都转换为C数组格式，以便直接嵌入到固件中
-- 支持的GIF表情包括：happy, natural, sad, scare, buxue, anger等
-
-### GIF显示特性
-- 使用LVGL的GIF解码器显示动画
-- 自动适配屏幕尺寸，确保GIF在240x240的显示区域内正确缩放
-- 支持动态切换不同表情，通过SetEmotion接口实现
-- 所有表情统一映射到happy.gif以简化资源管理
-
-### 显示区域配置
-- GIF显示区域设置为屏幕的60%大小（约144x144像素）
-- GIF自动居中显示在屏幕上
-- 底部保留区域用于显示聊天消息
-
-## 加载GIF动画的前置条件
-
-要在Jerry开发板上成功加载和显示GIF动画，需要满足以下前置条件：
-
-### 1. LVGL GIF支持库
-- 确保项目中已集成`lvgl/src/extra/libs/gif/lv_gif.h`库文件
-- 启用LVGL配置中的GIF支持选项（LV_USE_GIF）
-- 需要链接`lvgl/src/extra/libs/gif/lv_gif.c`源文件
-
-### 2. GIF文件格式要求
-- GIF文件必须转换为LVGL兼容的C数组格式
-- 使用的GIF应该是尺寸适中的动画（推荐宽度不超过240像素）
-- GIF文件应优化以适应嵌入式设备的内存限制
-- 每帧的尺寸应该保持一致
-
-### 3. 内存要求
-- 确保有足够的RAM来存储GIF数据和解码缓冲区
-- ESP32-S3的8MB PSRAM足以支持中等大小的GIF动画
-- 复杂的GIF动画可能需要额外的内存优化
-
-### 4. 文件转换步骤
-要将标准GIF文件转换为可在项目中使用的格式，需要执行以下步骤：
-
-#### 步骤1：准备GIF文件
-- 准备目标GIF动画文件，确保尺寸适中（推荐宽度不超过240像素）
-- 优化GIF的颜色数量和帧数以减小文件大小
-
-#### 步骤2：使用工具转换
-可以使用以下方法将GIF转换为C数组：
-
-方法一：使用在线转换工具
-- 访问LVGL官方提供的在线图像转换工具
-- 上传GIF文件并设置适当的参数（颜色格式、压缩等）
-- 下载生成的C文件和头文件
-
-方法二：使用命令行工具
-```bash
-# 使用lvgl官方工具进行转换
-python lvgl/scripts/lv_img_conv.py --ofmt=C --cf=RGB565 --compress=NONE input.gif -o output.c
-```
-
-#### 步骤3：集成到项目中
-- 将生成的C文件和头文件放入`newfunction/gif/`目录
-- 在对应的CMakeLists.txt中添加新文件的引用
-- 在需要使用GIF的源文件中包含相应的头文件
-- 声明GIF资源并使用LVGL API进行显示
-
-### 5. 显示配置
-- 需要创建lv_gif对象来显示动画
-- 使用`lv_gif_set_src()`函数设置GIF源数据
-- 可以使用`lv_image_set_scale()`调整GIF显示尺寸
-- 需要合理设置GIF显示区域大小以适应屏幕
-
-### 6. 性能优化建议
-- 对于复杂的GIF动画，建议预加载到PSRAM中
-- 避免同时播放多个GIF动画以节省内存
-- 对于简单的表情动画，可以考虑使用帧动画替代GIF
+- 显示屏：1.44 英寸 LCD，分辨率 128x128
+- 摄像头：OV2640
+- 音频：SPM1423HM4H-B 麦克风，NS4150 音频放大器
+- 存储：microSD 卡槽
+- 其他：用户按键、LED 指示灯
 
 ## 引脚分配
 
-### 音频部分
-- I2S麦克风引脚：
-  - WS: GPIO4
-  - SCK: GPIO5
-  - DIN: GPIO6
+### 音频接口
+- I2S 麦克风 (INMP441)：
+  - WS 引脚：GPIO4
+  - SCK 引脚：GPIO5
+  - DIN 引脚：GPIO6
 
-- I2S功放引脚：
-  - DOUT: GPIO7
-  - BCLK: GPIO15
-  - LRCK: GPIO16
+- I2S 功放 (MAX98367A)：
+  - DOUT 引脚：GPIO7
+  - BCLK 引脚：GPIO15
+  - LRCK 引脚：GPIO16
 
-### 显示部分
-- SPI显示屏引脚：
-  - MOSI: GPIO11
-  - SCLK: GPIO12
-  - CS: GPIO10
-  - DC: GPIO13
-  - RST: GPIO14
+### 显示接口
+- SPI 显示屏 (ST7789)：
+  - MOSI 引脚：GPIO47
+  - SCLK 引脚：GPIO21
+  - CS 引脚：GPIO41
+  - DC 引脚：GPIO40
+  - RST 引脚：GPIO45
+  - BL 引脚：GPIO42
 
-### 其他外设
-- RGB LED: GPIO48
-- 按键: GPIO0
+### 其他接口
+- RGB 灯带 (WS2812)：GPIO48
+- 用户按键：GPIO0
+
+## 新增功能和改进
+
+### GIF 表情显示系统增强
+
+Jerry 开发板现在支持全新的 GIF 表情显示系统，具有以下增强功能：
+
+1. **高帧率动画支持**：
+   - 支持 25fps 的流畅 GIF 动画播放
+   - 使用新的表情资源，提供更生动的视觉效果
+
+2. **智能主题适配**：
+   - 支持亮色和暗色主题切换
+   - GIF 动画会根据当前主题自动切换普通版或 Inversion 版
+   - 启动时会加载上次使用的主题设置
+
+3. **优化的 UI 层级管理**：
+   - 聊天消息文本始终显示在 GIF 表情上方
+   - 支持聊天消息的水平居中对齐和自动换行
+   - 改进了背景色处理，避免在暗色主题下出现白边
+
+4. **启动流程优化**：
+   - 消除了初始化过程中的屏幕闪烁问题
+   - 优化了 LVGL 初始化顺序，确保 UI 一次性完整显示
+
+### 问题解决过程
+
+在开发过程中，我们遇到了并解决了以下关键问题：
+
+1. **启动闪屏问题**：
+   - **问题**：设备启动时屏幕会闪烁，用户体验不佳
+   - **原因**：硬件初始化绘制白色背景与 LVGL 初始化绘制界面存在时间差
+   - **解决方案**：调整初始化顺序，先完成 LVGL 初始化再开启显示
+
+2. **主题切换时 GIF 未更新**：
+   - **问题**：切换亮色/暗色主题时，GIF 表情未自动切换到对应版本
+   - **原因**：缺少在主题切换时更新 GIF 的机制
+   - **解决方案**：添加 `UpdateGifForCurrentTheme()` 方法，在主题切换时自动更新 GIF
+
+3. **UI 元素层级问题**：
+   - **问题**：聊天消息文本有时被 GIF 表情遮挡
+   - **原因**：LVGL 对象层级管理不当
+   - **解决方案**：使用 `lv_obj_move_foreground()` 确保消息标签始终在最前
+
+4. **GIF 边框问题**：
+   - **问题**：在暗色主题下 GIF 周围出现白色边框
+   - **原因**：GIF 容器默认样式未正确设置
+   - **解决方案**：移除边框设置并正确配置背景色
+
+## 开发环境搭建
+
+1. 安装 ESP-IDF v5.4.2
+2. 克隆项目代码
+3. 执行 `idf.py menuconfig` 配置开发板参数
+4. 执行 `idf.py build` 编译项目
+5. 执行 `idf.py flash` 烧录固件
+
+## 自定义字体生成
+
+使用 `lv_font_conv` 工具生成自定义字体：
+
+```bash
+npx lv_font_conv --font "D:/ESP32/Project/font/YSHaoShenTi.ttf" --size 16 --format lvgl --bpp 4 --no-compress -o "D:/ESP32/Project/font/font_YSHaoShenTi_16px_b4.c" --range 0x20-0x7F --range 0x4E00-0x9FFF --range 0x3000-0x303F --range 0xFF00-0xFFEF
+```
+
+## 问题解决记录
+
+### 字体链接错误问题
+
+**问题描述：**
+在编译过程中遇到如下错误：
+```
+undefined reference to `font_YSHaoShenTi_16px_b4'
+```
+
+**问题分析：**
+1. 首先发现是字体符号未正确链接到最终可执行文件中
+2. 检查发现字体文件虽然存在，但未被正确添加到构建系统中
+3. 通过分析其他开发板实现方式，发现项目中字体文件应该在主 [main/CMakeLists.txt](file:///d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\CMakeLists.txt) 中统一管理，而不是在各开发板中单独添加
+
+**解决方案：**
+1. 在 [main/CMakeLists.txt](file:///d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\CMakeLists.txt) 的 `SOURCES` 列表中添加字体文件路径：
+   ```cmake
+   "../newfunction/font/font_YSHaoShenTi_16px_b4.c"
+   "../newfunction/font/font_YSHaoShenTi_18px_b4.c"
+   ```
+2. 移除 [Jerry-esp32s3/CMakeLists.txt](file:///d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\CMakeLists.txt) 中重复的字体文件包含，避免冲突
+3. 确保 [Jerry-esp32s3/jerry_esp32s3_board.cc](file:///d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\jerry_esp32s3_board.cc) 中正确使用 `LV_FONT_DECLARE` 声明字体：
+   ```cpp
+   LV_FONT_DECLARE(font_YSHaoShenTi_16px_b4);
+   ```
+
+**验证结果：**
+修改后重新编译项目，成功解决了字体链接错误问题，项目可以正常编译和运行。
+
+### GIF表情资源适配LVGL新版本API问题
+
+**问题描述：**
+在编译过程中遇到如下错误：
+```
+error: 'LV_IMG_CF_RAW_CHROMA_KEYED' undeclared here (not in a function)
+error: 'lv_image_header_t' has no member named 'always_zero'
+```
+
+**问题分析：**
+1. 项目中使用的LVGL版本已更新，部分API发生了变化
+2. 新添加的GIF资源文件仍在使用旧版本的API格式
+3. 旧API中的字段和常量已被新版本替代
+
+**解决方案：**
+1. 将所有GIF资源文件中的图像描述结构体定义从旧格式：
+   ```c
+   .header.cf = LV_IMG_CF_RAW_CHROMA_KEYED,
+   .header.always_zero = 0,
+   .header.reserved = 0,
+   ```
+   
+   更新为新格式：
+   ```c
+   .header.cf = LV_COLOR_FORMAT_RGB565,
+   .header.magic = LV_IMAGE_HEADER_MAGIC,
+   ```
+
+2. 删除多余的 `#endif /*LV_ATTRIBUTE_MEM_ALIGN*/` 行
+
+**验证结果：**
+修改后重新编译项目，成功解决了GIF资源适配问题，所有表情动画可以正常显示。
+
+## 功能特性
+
+### 表情显示功能
+
+Jerry开发板支持丰富的表情显示功能，通过GIF动画形式展现不同的情绪状态：
+
+1. 支持的基础表情：
+   - neutral（中性）-> natural_new_25fps.gif
+   - relaxed（放松）-> natural_new_25fps.gif
+   - sleepy（困倦）-> natural_new_25fps.gif
+   - happy（开心）-> excitement_25fps.gif
+   - laughing（笑）-> excitement_25fps.gif
+   - funny（有趣）-> excitement_25fps.gif
+   - loving（喜爱）-> excitement_25fps.gif
+   - confident（自信）-> excitement_25fps.gif
+   - winking（眨眼）-> excitement_25fps.gif
+   - cool（酷）-> excitement_25fps.gif
+   - delicious（美味）-> excitement_25fps.gif
+   - kissy（亲吻）-> excitement_25fps.gif
+   - silly（傻气）-> excitement_25fps.gif
+   - sad（悲伤）-> sad_25fps.gif
+   - crying（哭泣）-> sad_25fps.gif
+   - angry（愤怒）-> angry_25fps.gif
+   - surprised（惊讶）-> excitement_25fps.gif
+   - shocked（震惊）-> scare_25fps.gif
+   - thinking（思考）-> natural_new_25fps.gif
+   - confused（困惑）-> disdain_25fps.gif
+   - embarrassed（尴尬）-> disdain_25fps.gif
+   - natural（自然）-> natural_new_25fps.gif
+
+2. 特殊表情映射：
+   - disdain -> disdain_25fps.gif
+   - scare -> scare_25fps.gif
+   - natural_new -> natural_new_25fps.gif
+   - excitement -> excitement_25fps.gif
+
+### 表情显示位置调整
+
+为了优化视觉效果，GIF表情显示区域已调整至紧贴屏幕顶部：
+
+1. 表情GIF默认显示在屏幕上方
+2. 表情区域占据屏幕约70%的空间
+3. 通过调整 `lv_obj_set_y(emotion_gif_, 0)` 确保表情紧贴顶部显示
+
+### 聊天消息显示
+
+屏幕底部支持聊天消息显示功能：
+
+1. 消息显示区域位于屏幕底部
+2. 支持多行文本显示
+3. 具有半透明黑色背景以提高可读性
+
+## 使用说明
+
+1. 按照开发环境搭建步骤配置好环境
+2. 根据需要修改配置参数
+3. 编译并烧录固件
+4. 观察 LCD 显示和 LED 灯效果
+
+### 表情控制接口
+
+通过调用 `SetEmotion(const char* emotion)` 方法可以切换显示的表情：
+```cpp
+display->SetEmotion("happy");     // 显示开心表情
+display->SetEmotion("sad");       // 显示悲伤表情
+display->SetEmotion("angry");     // 显示愤怒表情
+```
+
+### 聊天消息显示接口
+
+通过调用 `SetChatMessage(const char* role, const char* content)` 方法可以显示聊天消息：
+```cpp
+display->SetChatMessage("user", "你好，小智！");  // 显示用户消息
+display->SetChatMessage("assistant", "你好！有什么可以帮助你的吗？");  // 显示助手消息
+```

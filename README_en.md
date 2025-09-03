@@ -1,53 +1,63 @@
 # An MCP-based Chatbot
 
-(English | [中文](README.md) | [日本語](README_ja.md))
+([中文](README.md) | English | [日本語](README_ja.md))
 
-## Video
+## Videos
 
-👉 [Human: Give AI a camera vs AI: Instantly finds out the owner hasn't washed hair for three days【bilibili】](https://www.bilibili.com/video/BV1bpjgzKEhd/)
+👉 [Human: Give AI a camera vs AI: Immediately discovers the owner hasn't washed their hair for three days 【bilibili】](https://www.bilibili.com/video/BV1bpjgzKEhd/)
 
-👉 [Handcraft your AI girlfriend, beginner's guide【bilibili】](https://www.bilibili.com/video/BV1XnmFYLEJN/)
+👉 [DIY Your AI Girlfriend, Beginner's Tutorial 【bilibili】](https://www.bilibili.com/video/BV1XnmFYLEJN/)
 
 ## Introduction
 
-This is an open-source ESP32 project, released under the MIT license, allowing anyone to use it for free, including for commercial purposes.
+This is an ESP32 project open-sourced by Xiaozhi, released under the MIT License, allowing anyone to use it freely or for commercial purposes.
 
-We hope this project helps everyone understand AI hardware development and apply rapidly evolving large language models to real hardware devices.
+We hope this project can help everyone understand AI hardware development and apply the rapidly developing large language models to actual hardware devices.
 
 If you have any ideas or suggestions, please feel free to raise Issues or join the QQ group: 1011329060
 
 ### Control Everything with MCP
 
-As a voice interaction entry, the XiaoZhi AI chatbot leverages the AI capabilities of large models like Qwen / DeepSeek, and achieves multi-terminal control via the MCP protocol.
+Xiaozhi AI Chatbot, as a voice interaction entry point, utilizes the AI capabilities of large models such as Qwen/DeepSeek to achieve multi-end control through the MCP protocol.
 
-![Control everything via MCP](docs/mcp-based-graph.jpg)
+![Control Everything with MCP](docs/mcp-based-graph.jpg)
 
-### Features Implemented
+### Implemented Features
 
 - Wi-Fi / ML307 Cat.1 4G
 - Offline voice wake-up [ESP-SR](https://github.com/espressif/esp-sr)
-- Supports two communication protocols ([Websocket](docs/websocket.md) or MQTT+UDP)
-- Uses OPUS audio codec
+- Support for two communication protocols ([Websocket](docs/websocket.md) or MQTT+UDP)
+- OPUS audio codec
 - Voice interaction based on streaming ASR + LLM + TTS architecture
-- Speaker recognition, identifies the current speaker [3D Speaker](https://github.com/modelscope/3D-Speaker)
-- OLED / LCD display, supports emoji display
+- Speaker recognition to identify the current speaker's identity [3D Speaker](https://github.com/modelscope/3D-Speaker)
+- OLED / LCD display, supporting emoji display
 - Battery display and power management
 - Multi-language support (Chinese, English, Japanese)
-- Supports ESP32-C3, ESP32-S3, ESP32-P4 chip platforms
-- Device-side MCP for device control (Speaker, LED, Servo, GPIO, etc.)
-- Cloud-side MCP to extend large model capabilities (smart home control, PC desktop operation, knowledge search, email, etc.)
+- Support for ESP32-C3, ESP32-S3, ESP32-P4 chip platforms
+- Device control via device-side MCP (volume, lights, motors, GPIO, etc.)
+- Extended large model capabilities via cloud MCP (smart home control, PC desktop operations, knowledge search, email sending/receiving, etc.)
+
+### Enhanced Features for Jerry ESP32-S3 Development Board
+
+- Brand new GIF emoji animation system with 25fps smooth animation display
+- Support for light and dark theme switching, adapting to different ambient lighting conditions
+- Intelligent theme adaptation, GIF animations automatically switch between normal and inversion versions based on the current theme
+- Optimized UI layer management to ensure chat messages are always clearly visible
+- Improved boot process, eliminating screen flickering during initialization
+- Support for loading the last used theme from settings for consistent user experience
+- Chat messages support horizontal center alignment and automatic line wrapping
 
 ## Hardware
 
 ### Breadboard DIY Practice
 
-See the Feishu document tutorial:
+For detailed tutorial, see Feishu document:
 
-👉 ["XiaoZhi AI Chatbot Encyclopedia"](https://ccnphfhqs21z.feishu.cn/wiki/F5krwD16viZoF0kKkvDcrZNYnhb?from=from_copylink)
+👉 [《Xiaozhi AI Chatbot Encyclopedia》](https://ccnphfhqs21z.feishu.cn/wiki/F5krwD16viZoF0kKkvDcrZNYnhb?from=from_copylink)
 
-Breadboard demo:
+Breadboard effect diagram as follows:
 
-![Breadboard Demo](docs/v1/wiring2.jpg)
+![Breadboard Effect Diagram](docs/v1/wiring2.jpg)
 
 ### Supports 70+ Open Source Hardware (Partial List)
 
