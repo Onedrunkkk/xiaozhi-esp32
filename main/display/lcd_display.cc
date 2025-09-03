@@ -723,7 +723,8 @@ void LcdDisplay::SetupUI() {
 
     /* Status bar */
     status_bar_ = lv_obj_create(container_);
-    lv_obj_set_size(status_bar_, LV_HOR_RES, fonts_.text_font->line_height);
+    lv_obj_set_height(status_bar_, LV_VER_RES * 16 / 100);  // 设置状态栏高度为16%
+    lv_obj_set_width(status_bar_, LV_HOR_RES);
     lv_obj_set_style_radius(status_bar_, 0, 0);
     lv_obj_set_style_bg_color(status_bar_, current_theme_.background, 0);
     lv_obj_set_style_text_color(status_bar_, current_theme_.text, 0);
@@ -733,10 +734,13 @@ void LcdDisplay::SetupUI() {
     lv_obj_set_scrollbar_mode(content_, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_radius(content_, 0, 0);
     lv_obj_set_width(content_, LV_HOR_RES);
-    lv_obj_set_flex_grow(content_, 1);
-    lv_obj_set_style_pad_all(content_, 5, 0);
-    lv_obj_set_style_bg_color(content_, current_theme_.chat_background, 0);
-    lv_obj_set_style_border_color(content_, current_theme_.border, 0); // Border color for content
+    lv_obj_set_height(content_, LV_VER_RES * 84 / 100);  // 设置内容区域高度为84%
+    lv_obj_set_style_pad_left(content_, 6, 0);  // 设置左边距为6px
+    lv_obj_set_style_pad_right(content_, 6, 0);  // 设置右边距为6px
+    lv_obj_set_style_pad_top(content_, 0, 0);
+    lv_obj_set_style_pad_bottom(content_, 0, 0);
+    lv_obj_set_style_bg_color(content_, current_theme_.background, 0);  // 统一背景颜色
+    lv_obj_set_style_border_width(content_, 0, 0);  // 移除边框
 
     lv_obj_set_flex_flow(content_, LV_FLEX_FLOW_COLUMN); // 垂直布局（从上到下）
     lv_obj_set_flex_align(content_, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_EVENLY); // 子对象居中对齐，等距分布
@@ -763,8 +767,10 @@ void LcdDisplay::SetupUI() {
     lv_obj_set_style_pad_all(status_bar_, 0, 0);
     lv_obj_set_style_border_width(status_bar_, 0, 0);
     lv_obj_set_style_pad_column(status_bar_, 0, 0);
-    lv_obj_set_style_pad_left(status_bar_, 2, 0);
-    lv_obj_set_style_pad_right(status_bar_, 2, 0);
+    lv_obj_set_style_pad_left(status_bar_, 6, 0);  // 设置左边距为6px
+    lv_obj_set_style_pad_right(status_bar_, 6, 0);  // 设置右边距为6px
+    // 设置状态栏的内容垂直居中
+    lv_obj_set_flex_align(status_bar_, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     network_label_ = lv_label_create(status_bar_);
     lv_label_set_text(network_label_, "");

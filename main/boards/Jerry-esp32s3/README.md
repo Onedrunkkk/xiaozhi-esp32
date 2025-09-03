@@ -29,6 +29,23 @@ Jerry ESP32-S3是一款专为AI聊天机器人设计的开发板，具有以下�
 
 如需修改字体，可以在`jerry_esp32s3_board.cc`文件中修改[DisplayFonts](file:///d:/ESP32/Project/ESP32-AI/xiaozhi-esp32/managed_components/78__xiaozhi-display/src/display.h#L12-L16)结构体中的[text_font](file:///d:/ESP32/Project/ESP32-AI/xiaozhi-esp32/managed_components/78__xiaozhi-display/src/display.h#L13-L13)字段，并在CMakeLists.txt中添加相应的字体文件路径。
 
+### 字体转换指令
+
+如果需要将TTF字体文件转换为LVGL可用的C数组格式，可以使用以下命令：
+
+```bash
+npx lv_font_conv --font "D:/ESP32/Project/font/YSHaoShenTi.ttf" --size 16 --format lvgl --bpp 4 --no-compress -o "D:/ESP32/Project/font/font_YSHaoShenTi_16px_b4.c" --range 0x20-0x7F --range 0x4E00-0x9FFF
+```
+
+参数说明：
+- `--font`: 指定输入的TTF字体文件路径
+- `--size`: 设置字体大小（例如16像素）
+- `--format lvgl`: 指定输出格式为LVGL兼容格式
+- `--bpp 4`: 设置颜色深度为4位（16级灰度）
+- `--no-compress`: 禁用压缩以获得更好的显示效果
+- `-o`: 指定输出文件路径
+- `--range`: 指定字符范围，包括ASCII字符(0x20-0x7F)和中文常用汉字(0x4E00-0x9FFF)
+
 ## 引脚分配
 
 ### 音频部分

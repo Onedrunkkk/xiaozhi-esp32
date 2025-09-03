@@ -1,4 +1,7 @@
 {
     "name": "Jerry ESP32-S3 Development Board",
-    "type": "Jerry-esp32s3"
+    "type": "Jerry-esp32s3",
+    "options": {
+        "CONFIG_USE_WECHAT_MESSAGE_STYLE": "n"
+    }
 }
