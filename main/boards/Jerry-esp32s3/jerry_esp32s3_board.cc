@@ -2,6 +2,7 @@
 #include "codecs/box_audio_codec.h"
 #include "codecs/no_audio_codec.h"
 #include "display/lcd_display.h"
+#include "jerry_emoji_display.h"
 #include "application.h"
 #include "button.h"
 #include "config.h"
@@ -137,7 +138,7 @@ private:
             .emoji_font = font_emoji_32_init(),  // 使用32像素的emoji字体
         };
         
-        display_ = new SpiLcdDisplay(
+        display_ = new JerryEmojiDisplay(
             io_handle,
             panel_handle,
             DISPLAY_WIDTH,
