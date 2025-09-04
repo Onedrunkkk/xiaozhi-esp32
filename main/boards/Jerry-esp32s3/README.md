@@ -39,6 +39,110 @@ Jerry ESP32-S3 是一款基于 ESP32-S3 芯片的开发板，集成了 LCD 显�
 - RGB 灯带 (WS2812)：GPIO48
 - 用户按键：GPIO0
 
+## UI界面布局
+
+Jerry开发板的UI界面采用分层设计，主要包含以下几个区域：
+
+### 1. 状态栏区域
+- 位置：屏幕顶部
+- 内容：显示时间、WiFi信号强度、电池电量等系统状态信息
+- 更新频率：每10秒自动更新一次
+
+### 2. 表情显示区域
+- 位置：屏幕中部偏上
+- 内容：显示GIF格式的表情动画
+- 特点：占据屏幕约70%的空间，紧贴屏幕顶部显示
+
+### 3. 聊天消息区域
+- 位置：屏幕底部
+- 内容：显示AI交互的聊天消息
+- 特点：支持多行文本显示，具有半透明背景以提高可读性
+
+### 4. 通知区域
+- 位置：状态栏下方
+- 内容：临时显示系统通知信息
+- 特点：显示一段时间后自动消失
+
+## 网络图标更换方法
+
+Jerry开发板使用Font Awesome字体图标显示WiFi信号强度，根据信号强度不同显示不同图标：
+
+### 默认图标映射
+- 强信号 (RSSI >= -60dBm)：FONT_AWESOME_WIFI ()
+- 中等信号 (RSSI >= -70dBm)：FONT_AWESOME_WIFI_FAIR ()
+- 弱信号 (RSSI < -70dBm)：FONT_AWESOME_WIFI_WEAK ()
+- 无连接：FONT_AWESOME_WIFI_SLASH ()
+
+### 更换方法
+
+#### 方法一：替换Font Awesome字体映射（推荐）
+1. 准备新的PNG图标文件
+2. 使用LVGL官方图像转换工具将PNG转换为C数组格式
+   - 选择颜色格式：RGB565
+   - 选择LVGL版本：v9
+   - 设置输出格式为C数组
+3. 将生成的C数组文件添加到项目中
+4. 修改 [jerry_emoji_display.cc](file:///d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\jerry_emoji_display.cc) 文件中的 [SetIcon](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\jerry_emoji_display.h#L37-L37) 方法，根据不同的WiFi信号强度显示对应的PNG图标
+
+#### 方法二：修改Font Awesome图标定义
+1. 直接修改 [font_awesome.h](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\managed_components\78__xiaozhi-fonts\include\font_awesome.h) 文件中的图标定义
+2. 将 [FONT_AWESOME_WIFI](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\managed_components\78__xiaozhi-fonts\include\font_awesome.h#L28-L28)、[FONT_AWESOME_WIFI_FAIR](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\managed_components\78__xiaozhi-fonts\include\font_awesome.h#L29-L29)、[FONT_AWESOME_WIFI_WEAK](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\managed_components\78__xiaozhi-fonts\include\font_awesome.h#L30-L30)、[FONT_AWESOME_WIFI_SLASH](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\managed_components\78__xiaozhi-fonts\include\font_awesome.h#L31-L31) 定义替换为自定义字符
+3. 重新编译项目使更改生效
+
+#### 方法三：自定义网络状态图标显示
+1. 在 [JerryEmojiDisplay](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\jerry_emoji_display.h#L18-L46) 类中添加专门用于显示网络状态图标的对象
+2. 修改 [SetIcon](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\jerry_emoji_display.h#L37-L37) 方法实现网络图标显示逻辑
+3. 在 [jerry_esp32s3_board.cc](file:///d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\boards\Jerry-esp32s3\jerry_esp32s3_board.cc) 中根据网络状态调用相应的图标显示方法
+
+## PNG图标转换为C数组
+
+要将PNG图标转换为可以在项目中使用的C数组，需要使用LVGL官方提供的图像转换工具。
+
+### 在线转换工具（推荐）
+
+1. 访问LVGL官方图像转换网站：https://lvgl.io/tools/imageconverter
+2. 点击"Choose File"按钮选择要转换的PNG图标文件
+3. 在设置选项中进行如下配置：
+   - **Color format（颜色格式）**：选择RGB565（适用于Jerry开发板的ST7789 LCD屏幕）
+   - **LVGL version（LVGL版本）**：选择v9（项目当前使用的LVGL版本）
+   - **Output format（输出格式）**：选择C array
+   - **Dithering（抖动）**：可根据需要选择是否启用
+4. 点击"Convert"按钮开始转换
+5. 转换完成后，点击"Save C"按钮下载生成的C文件
+
+### 命令行工具转换
+
+如果需要通过命令行进行批量转换或自动化处理，可以使用npm安装LVGL图像转换工具：
+
+```bash
+npm install -g lv_img_conv
+```
+
+然后使用以下命令进行转换：
+
+```bash
+npx lv_img_conv --input icon.png --output icon.c --format C --color-format RGB565 --dither true
+```
+
+参数说明：
+- `--input`：输入的PNG文件路径
+- `--output`：输出的C文件路径
+- `--format`：输出格式，这里选择C
+- `--color-format`：颜色格式，选择RGB565
+- `--dither`：是否启用抖动处理
+
+### 在项目中使用转换后的C数组
+
+1. 将生成的C文件添加到项目中，例如放在[newfunction/icon](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\newfunction\icon)目录下
+2. 在需要使用图标的源文件中声明图像：
+   ```c
+   LV_IMAGE_DECLARE(icon_name);  // icon_name是生成的C文件中的变量名
+   ```
+3. 使用[lv_image_set_src()](file://d:\ESP32\Project\ESP32-AI\xiaozhi-esp32\main\display\lcd_display.cc#L689-L695)函数设置图像源：
+   ```c
+   lv_image_set_src(image_object, &icon_name);
+   ```
+
 ## 新增功能和改进
 
 ### GIF 表情显示系统增强
@@ -109,7 +213,7 @@ npx lv_font_conv --font "D:/ESP32/Project/font/YSHaoShenTi.ttf" --size 16 --form
 
 **问题描述：**
 在编译过程中遇到如下错误：
-```
+```bash
 undefined reference to `font_YSHaoShenTi_16px_b4'
 ```
 
@@ -137,7 +241,7 @@ undefined reference to `font_YSHaoShenTi_16px_b4'
 
 **问题描述：**
 在编译过程中遇到如下错误：
-```
+```bash
 error: 'LV_IMG_CF_RAW_CHROMA_KEYED' undeclared here (not in a function)
 error: 'lv_image_header_t' has no member named 'always_zero'
 ```
